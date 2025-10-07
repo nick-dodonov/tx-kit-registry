@@ -1,0 +1,18 @@
+# Bazel
+/bazel-*
+MODULE.bazel.lock
+.*.bazelrc
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+venv/
+.venv/
+
+# OS/caches/temp files
+.DS_Store
+Thumbs.db
+*.bak
+*.tmp
+*.log

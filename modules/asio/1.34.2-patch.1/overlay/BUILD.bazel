@@ -1,0 +1,24 @@
+load("@rules_cc//cc:defs.bzl", "cc_library")
+
+cc_library(
+    name = "asio",
+    srcs = [
+        "asio/src/asio.cpp",
+        "asio/src/asio_ssl.cpp",
+    ],
+    hdrs = glob([
+        "asio/include/**/*.hpp",
+        "asio/include/**/*.ipp",
+    ]),
+    includes = ["asio/include"],
+    local_defines = ["ASIO_SEPARATE_COMPILATION"],
+    defines = [
+        #### Workaround for building asio_ssl.cpp w/ on Emscripten platform
+        # Otherwise it fails with error: "tss_ptr.hpperror: Only Windows and POSIX are supported!"
+        # TODO: possibly make bazel feature that can be enabled for emscripten platform instead of this hack
+        # TODO: possibly better to unset ASIO_HAS_THREADS somehow (via feature and ASIO_DISABLE_THREADS define)
+        "ASIO_HAS_PTHREADS",
+    ],
+    visibility = ["//visibility:public"],
+    deps = ["@boringssl//:ssl"],
+)

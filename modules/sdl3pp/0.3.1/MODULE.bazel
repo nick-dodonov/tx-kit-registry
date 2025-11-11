@@ -1,0 +1,4 @@
+"""Module definition for SDL3 library."""
+module(name = "sdl3pp", version = "0.3.1")
+
+bazel_dep(name = "rules_cc", version = "0.2.14")

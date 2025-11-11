@@ -1,0 +1,8 @@
+{
+    "url": "https://github.com/libsdl-org/SDL/releases/download/release-3.2.26/SDL3-3.2.26.tar.gz",
+    "integrity": "sha256-2tSIR0pRoLAdVHzSg0iT1imTKNLjD0eaNWQIi1R2uuI=",
+    "strip_prefix": "SDL3-3.2.26",
+    "overlay": {
+        "BUILD.bazel": "sha256-ylfmusz8tr3B+ZA7ynGW5BsuPiPDfKAquAM5IAGBps8="
+    }
+}

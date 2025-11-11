@@ -1,0 +1,8 @@
+{
+    "url": "https://github.com/talesm/SDL3pp/archive/refs/tags/v0.3.1.tar.gz",
+    "integrity": "sha256-MgoKrqQ5RZkTmMJaM7iM6Q7oSw3QDEi2OxrRbF9ZOrw=",
+    "strip_prefix": "SDL3pp-0.3.1",
+    "overlay": {
+        "BUILD.bazel": "sha256-LKoCpcswoJWpZm/HADi2uixajs0Vgor4O2yJqAZQn3M="
+    }
+}

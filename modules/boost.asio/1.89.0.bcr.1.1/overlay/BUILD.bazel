@@ -89,6 +89,11 @@ cc_library(
             "WIN32_LEAN_AND_MEAN",  # Prevent windows.h from auto-including winsock.h - must propagate
             "NOMINMAX",  # Prevent Windows min/max macros
         ],
+        #### Workaround for building asio_ssl.cpp w/ on Emscripten platform
+        "@platforms//cpu:wasm32": [
+            "BOOST_ASIO_DISABLE_BOOST_CONTEXT_FIBER",
+        ],
+        ####
         "//conditions:default": [],
     }),
     includes = ["include"],
@@ -106,7 +111,10 @@ cc_library(
         "@boost.align",
         "@boost.assert",
         "@boost.config",
-        "@boost.context",
+        #### Workaround for building asio_ssl.cpp w/ on Emscripten platform
+        #   moved to select() below
+        #"@boost.context",
+        ####
         "@boost.date_time",
         "@boost.system",
         "@boost.throw_exception",
@@ -114,5 +122,12 @@ cc_library(
         ":boringssl": ["@boringssl//:ssl"],
         ":no_ssl": [],
         ":openssl": ["@openssl//:ssl"],
+    #### Workaround for building asio_ssl.cpp w/ on Emscripten platform
+    }) + select({
+        "//conditions:default": [
+            "@boost.context",
+        ],
+        "@platforms//cpu:wasm32": [],
     }),
+    ####
 )

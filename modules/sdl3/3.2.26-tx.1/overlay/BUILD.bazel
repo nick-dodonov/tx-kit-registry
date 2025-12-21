@@ -55,7 +55,7 @@ cmake(
     }),
     out_include_dir = "include",
     out_static_libs = select({
-        "@bazel_tools//src/conditions:windows": ["SDL3.lib"],
+        "@bazel_tools//src/conditions:windows": ["SDL3-static.lib"],
         "//conditions:default": ["libSDL3.a"],
     }),
     visibility = ["//visibility:private"],
@@ -65,7 +65,7 @@ cmake(
 cc_library(
     name = "sdl3_static",
     deps = [":sdl3_static_base"],
-    # Optional link options to be passed up to the dependencies of this library
+    # link options to be passed up to the dependencies of this library
     linkopts = select({
         "@bazel_tools//src/conditions:darwin": [
             "-framework", "CoreGraphics",
@@ -83,6 +83,19 @@ cc_library(
             "-framework", "AppKit",
             "-framework", "QuartzCore",
             "-framework", "UniformTypeIdentifiers",
+        ],
+        "@bazel_tools//src/conditions:windows": [
+            "User32.lib",   # Window functions (CreateWindow, MessageBox, etc.)
+            "Gdi32.lib",    # GDI functions (CreateDC, SelectObject, BitBlt, GetDeviceCaps, etc.)
+            "Advapi32.lib", # Registry functions (RegOpenKeyExW, etc.)
+            "Shell32.lib",  # Shell functions (ShellExecuteW, SHGetFolderPathW, etc.)
+            "Ole32.lib",    # COM functions (CoInitializeEx, CoCreateInstance, etc.)
+            "Oleaut32.lib", # OLE Automation functions (IDispatch, VARIANT, SysFreeString, etc.)
+            "Imm32.lib",    # IME Input Method Manager functions
+            "Winmm.lib",    # Windows Multimedia functions (timeBeginPeriod, etc.)
+            "Version.lib",  # Version functions (GetFileVersionInfo, etc.)
+            "Setupapi.lib", # Device Setup API functions (SetupDiGetClassDevs, etc.)
+            #"Cfgmgr32.lib", # Configuration Manager functions
         ],
         "//conditions:default": [],
     }),

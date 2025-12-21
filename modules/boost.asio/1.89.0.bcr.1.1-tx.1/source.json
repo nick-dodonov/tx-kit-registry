@@ -4,7 +4,7 @@
     "url": "https://github.com/boostorg/asio/archive/refs/tags/boost-1.89.0.tar.gz",
     "patch_strip": 0,
     "overlay": {
-        "BUILD.bazel": "sha256-rCJnnXoXgz3NLFmSdywW5RCxBWRG2rv+Uy1lu0EOJ08=",
+        "BUILD.bazel": "sha256-qRCF5tl+KEG26Om/WpD5Jid08HgCmx7puJa3iu90MLk=",
         "MODULE.bazel": "sha256-lLdonH147/98BUT022r2pyfeArf7/N6wLTXoL4UuutU=",
         "test/BUILD.bazel": "sha256-0Coq/4pwrla0GbKQXAEKVCOdXNtYuA7/Xr1ylL06TGs=",
         "test/MODULE.bazel": "sha256-v/GleRhV0C3jPcTGI0HYrOk3uYqhoC/53Kxx2nKBvAg=",

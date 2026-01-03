@@ -173,7 +173,15 @@ class PrivateRegistryClient:
                     print(f"Added new {source_key[:-1]} {item_key}: {file_integrity}")
         
         # Always keep the section, even if empty
-        source[source_key] = items_dict
+        # Preserve order of existing items, then add new ones
+        ordered_dict = {}
+        for key in current_items:
+            if key in items_dict:
+                ordered_dict[key] = items_dict[key]
+        for key in items_dict:
+            if key not in ordered_dict:
+                ordered_dict[key] = items_dict[key]
+        source[source_key] = ordered_dict
     
     def update_integrity(self, module_name, version):
         """Update SRI hashes in source.json file."""

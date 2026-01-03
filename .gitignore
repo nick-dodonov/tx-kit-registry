@@ -16,3 +16,6 @@ Thumbs.db
 *.bak
 *.tmp
 *.log
+
+# tools/update_integrity.sh cache
+/.cache/

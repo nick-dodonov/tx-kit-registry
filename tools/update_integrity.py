@@ -17,17 +17,53 @@ import urllib.request
 import urllib.error
 
 
-def download(url):
-    """Download file from URL and return its content."""
+def download(url, module_name=None, version=None):
+    """Download file from URL and return its content.
+    
+    Caches downloaded files in .cache/bazel-registry/integrity/{module}/{version}/{url-hash}/{filename}
+    using SHA256 of URL as part of the path.
+    
+    Args:
+        url: URL to download
+        module_name: Optional module name for cache organization
+        version: Optional module version for cache organization
+    """
     if url.startswith("file://"):
         # Handle file:// URLs for testing
         file_path = url[7:]  # Remove file:// prefix
         with open(file_path, "rb") as f:
             return f.read()
     
+    # Extract filename from URL
+    filename = url.split("/")[-1]
+    
+    # Setup cache directory
+    cache_dir = pathlib.Path(".cache/bazel-registry/integrity")
+    
+    # Use SHA256 of URL as part of the cache path
+    url_hash = hashlib.sha256(url.encode()).hexdigest()
+    
+    # Build full cache path
+    if module_name and version:
+        cache_file = cache_dir / module_name / version / url_hash / filename
+    else:
+        cache_file = cache_dir / url_hash / filename
+    
+    cache_file.parent.mkdir(parents=True, exist_ok=True)
+    
+    # Check if file is already cached
+    if cache_file.exists():
+        print(f"Using cached file for {url}")
+        return read_file(cache_file)
+    
+    # Download and cache
     try:
         with urllib.request.urlopen(url) as response:
-            return response.read()
+            data = response.read()
+        # Write to cache
+        with open(cache_file, "wb") as f:
+            f.write(data)
+        return data
     except urllib.error.URLError as e:
         raise RuntimeError(f"Failed to download {url}: {e}")
 
@@ -194,7 +230,7 @@ class PrivateRegistryClient:
         # Update main archive integrity
         if "url" in source:
             print(f"Downloading and calculating integrity for {source['url']}")
-            archive_data = download(source["url"])
+            archive_data = download(source["url"], module_name=module_name, version=version)
             source["integrity"] = integrity(archive_data)
             print(f"Updated main archive integrity: {source['integrity']}")
         

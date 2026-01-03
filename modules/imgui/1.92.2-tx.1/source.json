@@ -13,6 +13,6 @@
         "examples/example_win32_directx12/BUILD.bazel": "sha256-Z+2SJGxHEVE78bdTh0FCAcdzr+42/hXzHev1WoBAVcs=",
         "examples/example_win32_directx9/BUILD.bazel": "sha256-LzJiJDgzJFY/ZPQraDEo5es/w+zZW2Jwm7JgKBXOg2M=",
         "examples/example_win32_opengl3/BUILD.bazel": "sha256-9tzKuBS9mclm/vZiJYesPmCt14lGIihD84lJVOm2QS8=",
-        "MODULE.bazel": "sha256-kmBCjKbRuOqcZG4DebLhTjaQr7EAYTkrg+TbZhtvX+Q="
+        "MODULE.bazel": "sha256-SjX6AvNZ06Pac2vP+3Kzt3PCfOMzNx0hN2WL7uI4RzQ="
     }
 }

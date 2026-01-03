@@ -135,28 +135,29 @@ class PrivateRegistryClient:
         version_dir = module_dir / version
         return version_dir.exists()
     
-    def update_directory_integrity(self, directory: pathlib.Path, source_key: str, source: dict[str, dict[str, str]], item_type: str = "file") -> None:
+    def update_directory_integrity(
+            self, 
+            directory: pathlib.Path, 
+            source_key: str, 
+            source: dict[str, dict[str, str]], 
+            filter_func = None
+            ) -> None:
         """Update SRI hashes for files in a directory.
         
         Args:
             directory: Path to directory to scan
             source_key: Key in source dict (e.g., "patches" or "overlay")
             source: Source dict to update
-            item_type: Type of items - "file" for flat list, "overlay" for recursive with filter
+            filter_func: Callable that takes Path and returns bool for filtering files
         """
+        if filter_func is None:
+            filter_func = lambda p: p.is_file()
+        
         current_items = source.get(source_key, {})
         items_dict = {}
         
         if directory.exists():
-            if item_type == "overlay":
-                # For overlay, use recursive scan with filter
-                files_list = []
-                for path in directory.rglob("*"):
-                    if path.is_file() and path.name != "MODULE.bazel.lock":
-                        files_list.append(path)
-            else:
-                # For patches, use simple iteration
-                files_list = [p for p in directory.iterdir() if p.is_file()]
+            files_list = [p for p in directory.rglob("*") if filter_func(p)]
             
             for file_path in files_list:
                 item_key = str(file_path.relative_to(directory))
@@ -191,10 +192,14 @@ class PrivateRegistryClient:
         
         # Update patches and overlay using unified method
         patches_dir = self.get_patches_dir(module_name, version)
-        self.update_directory_integrity(patches_dir, "patches", source, item_type="file")
+        # For patches, only include files in root directory
+        patches_filter = lambda p: p.is_file() and p.parent == patches_dir
+        self.update_directory_integrity(patches_dir, "patches", source, filter_func=patches_filter)
         
         overlay_dir = self.get_overlay_dir(module_name, version)
-        self.update_directory_integrity(overlay_dir, "overlay", source, item_type="overlay")
+        # For overlay, include all files except MODULE.bazel.lock
+        overlay_filter = lambda p: p.is_file() and p.name != "MODULE.bazel.lock"
+        self.update_directory_integrity(overlay_dir, "overlay", source, filter_func=overlay_filter)
         
         # Write updated source.json
         json_dump(source_path, source, sort_keys=False)

@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
+# type: ignore
 """
 Private registry integrity updater.
 
-Аналог BCR update_integrity для приватного реестра.
-Обновляет SHA хеши в source.json файлах.
+Analogue of BCR update_integrity for private registry.
+Updates SHA hashes in source.json files.
 """
 
 import os
@@ -16,17 +17,53 @@ import urllib.request
 import urllib.error
 
 
-def download(url):
-    """Download file from URL and return its content."""
+def download(url, module_name=None, version=None):
+    """Download file from URL and return its content.
+    
+    Caches downloaded files in .cache/bazel-registry/integrity/{module}/{version}/{url-hash}/{filename}
+    using SHA256 of URL as part of the path.
+    
+    Args:
+        url: URL to download
+        module_name: Optional module name for cache organization
+        version: Optional module version for cache organization
+    """
     if url.startswith("file://"):
         # Handle file:// URLs for testing
         file_path = url[7:]  # Remove file:// prefix
         with open(file_path, "rb") as f:
             return f.read()
     
+    # Extract filename from URL
+    filename = url.split("/")[-1]
+    
+    # Setup cache directory
+    cache_dir = pathlib.Path(".cache/bazel-registry/integrity")
+    
+    # Use SHA256 of URL as part of the cache path
+    url_hash = hashlib.sha256(url.encode()).hexdigest()
+    
+    # Build full cache path
+    if module_name and version:
+        cache_file = cache_dir / module_name / version / url_hash / filename
+    else:
+        cache_file = cache_dir / url_hash / filename
+    
+    cache_file.parent.mkdir(parents=True, exist_ok=True)
+    
+    # Check if file is already cached
+    if cache_file.exists():
+        print(f"Using cached file for {url}")
+        return read_file(cache_file)
+    
+    # Download and cache
     try:
         with urllib.request.urlopen(url) as response:
-            return response.read()
+            data = response.read()
+        # Write to cache
+        with open(cache_file, "wb") as f:
+            f.write(data)
+        return data
     except urllib.error.URLError as e:
         raise RuntimeError(f"Failed to download {url}: {e}")
 
@@ -134,6 +171,54 @@ class PrivateRegistryClient:
         version_dir = module_dir / version
         return version_dir.exists()
     
+    def update_directory_integrity(
+            self, 
+            directory: pathlib.Path, 
+            source_key: str, 
+            source: dict[str, dict[str, str]], 
+            filter_func = None
+            ) -> None:
+        """Update SRI hashes for files in a directory.
+        
+        Args:
+            directory: Path to directory to scan
+            source_key: Key in source dict (e.g., "patches" or "overlay")
+            source: Source dict to update
+            filter_func: Callable that takes Path and returns bool for filtering files
+        """
+        if filter_func is None:
+            filter_func = lambda p: p.is_file()
+        
+        current_items = source.get(source_key, {})
+        items_dict = {}
+        
+        if directory.exists():
+            files_list = [p for p in directory.rglob("*") if filter_func(p)]
+            
+            for file_path in files_list:
+                item_key = str(file_path.relative_to(directory))
+                
+                file_data = read_file(file_path)
+                file_integrity = integrity(file_data)
+                items_dict[item_key] = file_integrity
+                
+                if item_key in current_items:
+                    if current_items[item_key] != file_integrity:
+                        print(f"Updated {source_key[:-1]} {item_key}: {file_integrity}")
+                else:
+                    print(f"Added new {source_key[:-1]} {item_key}: {file_integrity}")
+        
+        # Always keep the section, even if empty
+        # Preserve order of existing items, then add new ones
+        ordered_dict = {}
+        for key in current_items:
+            if key in items_dict:
+                ordered_dict[key] = items_dict[key]
+        for key in items_dict:
+            if key not in ordered_dict:
+                ordered_dict[key] = items_dict[key]
+        source[source_key] = ordered_dict
+    
     def update_integrity(self, module_name, version):
         """Update SRI hashes in source.json file."""
         if not self.module_exists(module_name, version):
@@ -145,68 +230,20 @@ class PrivateRegistryClient:
         # Update main archive integrity
         if "url" in source:
             print(f"Downloading and calculating integrity for {source['url']}")
-            archive_data = download(source["url"])
+            archive_data = download(source["url"], module_name=module_name, version=version)
             source["integrity"] = integrity(archive_data)
             print(f"Updated main archive integrity: {source['integrity']}")
         
-        # Update patches integrity
+        # Update patches and overlay using unified method
         patches_dir = self.get_patches_dir(module_name, version)
-        if patches_dir.exists():
-            current_patches = source.get("patches", {})
-            available_patches = [p for p in patches_dir.iterdir() if p.is_file()]
-            
-            if available_patches:
-                patches = {}
-                for patch_file in available_patches:
-                    patch_name = patch_file.name
-                    patch_data = read_file(patch_file)
-                    patch_integrity = integrity(patch_data)
-                    patches[patch_name] = patch_integrity
-                    
-                    if patch_name in current_patches:
-                        if current_patches[patch_name] != patch_integrity:
-                            print(f"Updated patch {patch_name}: {patch_integrity}")
-                    else:
-                        print(f"Added new patch {patch_name}: {patch_integrity}")
-                
-                source["patches"] = patches
-            else:
-                # No patches exist, remove patches section
-                source.pop("patches", None)
-        else:
-            # No patches directory, remove patches section
-            source.pop("patches", None)
+        # For patches, only include files in root directory
+        patches_filter = lambda p: p.is_file() and p.parent == patches_dir
+        self.update_directory_integrity(patches_dir, "patches", source, filter_func=patches_filter)
         
-        # Update overlay integrity
         overlay_dir = self.get_overlay_dir(module_name, version)
-        if overlay_dir.exists():
-            overlay_files = []
-            for path in overlay_dir.rglob("*"):
-                if path.is_file() and path.name != "MODULE.bazel.lock":
-                    overlay_files.append(path)
-            
-            if overlay_files:
-                overlay = {}
-                for overlay_file in overlay_files:
-                    relative_path = str(overlay_file.relative_to(overlay_dir))
-                    overlay_data = read_file(overlay_file)
-                    overlay_integrity = integrity(overlay_data)
-                    overlay[relative_path] = overlay_integrity
-                    
-                    current_overlay = source.get("overlay", {})
-                    if relative_path in current_overlay:
-                        if current_overlay[relative_path] != overlay_integrity:
-                            print(f"Updated overlay {relative_path}: {overlay_integrity}")
-                    else:
-                        print(f"Added new overlay {relative_path}: {overlay_integrity}")
-                
-                source["overlay"] = overlay
-            else:
-                # No overlay files, remove overlay section
-                source.pop("overlay", None)
-        else:
-            # No overlay directory, remove overlay section
-            source.pop("overlay", None)
+        # For overlay, include all files except MODULE.bazel.lock
+        overlay_filter = lambda p: p.is_file() and p.name != "MODULE.bazel.lock"
+        self.update_directory_integrity(overlay_dir, "overlay", source, filter_func=overlay_filter)
         
         # Write updated source.json
         json_dump(source_path, source, sort_keys=False)

@@ -171,11 +171,11 @@ class PrivateRegistryClient:
                 
                 source["patches"] = patches
             else:
-                # No patches exist, remove patches section
-                source.pop("patches", None)
+                # No patches exist, keep empty patches section
+                source["patches"] = {}
         else:
-            # No patches directory, remove patches section
-            source.pop("patches", None)
+            # No patches directory, keep empty patches section
+            source["patches"] = {}
         
         # Update overlay integrity
         overlay_dir = self.get_overlay_dir(module_name, version)
@@ -202,11 +202,11 @@ class PrivateRegistryClient:
                 
                 source["overlay"] = overlay
             else:
-                # No overlay files, remove overlay section
-                source.pop("overlay", None)
+                # No overlay files, keep empty overlay section
+                source["overlay"] = {}
         else:
-            # No overlay directory, remove overlay section
-            source.pop("overlay", None)
+            # No overlay directory, keep empty overlay section
+            source["overlay"] = {}
         
         # Write updated source.json
         json_dump(source_path, source, sort_keys=False)

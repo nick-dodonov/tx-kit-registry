@@ -2,6 +2,32 @@ load("@rules_cc//cc:defs.bzl", "cc_library")
 
 package(default_visibility = ["//visibility:public"])
 
+#### SDL3 support
+cc_library(
+    name = "platform-sdl3",
+    srcs = ["imgui_impl_sdl3.cpp"],
+    hdrs = ["imgui_impl_sdl3.h"],
+    include_prefix = "imgui",
+    includes = ["."],
+    deps = [
+        "//:imgui",
+        "@sdl3//:sdl3_static",
+    ],
+)
+
+cc_library(
+    name = "renderer-sdlrenderer3",
+    srcs = ["imgui_impl_sdlrenderer3.cpp"],
+    hdrs = ["imgui_impl_sdlrenderer3.h"],
+    include_prefix = "imgui",
+    includes = ["."],
+    deps = [
+        "//:imgui",
+        "@sdl3//:sdl3_static",
+    ],
+)
+####
+
 cc_library(
     name = "platform-glfw",
     srcs = ["imgui_impl_glfw.cpp"],

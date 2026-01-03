@@ -5,7 +5,7 @@
     "patch_strip": 1,
     "patches": {},
     "overlay": {
-        "backends/BUILD.bazel": "sha256-Nw6btxep53bxQAsSG9uiFDvfUnA8ESdLa62hc/8IyWw=",
+        "backends/BUILD.bazel": "sha256-3fLTIyMgFw7g214rUkuSshHk0fB+tReOZruvA/uaXtY=",
         "BUILD.bazel": "sha256-gZo/FwvLbNU6xL0XX61/Wbkx2BN5j1goWLLAyye5tQc=",
         "examples/example_glfw_opengl3/BUILD.bazel": "sha256-wTdD4nkg3rvQmg3bPjU2GJTsw5Lry9GYN/mnxMzZe8E=",
         "examples/example_win32_directx10/BUILD.bazel": "sha256-DaG4vRl9qrZq4U4sWEUNM1fq6Ws4Ey8uBT/EyhlWDTE=",
@@ -13,6 +13,6 @@
         "examples/example_win32_directx12/BUILD.bazel": "sha256-Z+2SJGxHEVE78bdTh0FCAcdzr+42/hXzHev1WoBAVcs=",
         "examples/example_win32_directx9/BUILD.bazel": "sha256-LzJiJDgzJFY/ZPQraDEo5es/w+zZW2Jwm7JgKBXOg2M=",
         "examples/example_win32_opengl3/BUILD.bazel": "sha256-9tzKuBS9mclm/vZiJYesPmCt14lGIihD84lJVOm2QS8=",
-        "MODULE.bazel": "sha256-SjX6AvNZ06Pac2vP+3Kzt3PCfOMzNx0hN2WL7uI4RzQ="
+        "MODULE.bazel": "sha256-pFGm47Plrj7rqrwJvtaWpvjKp+blb1fiHPCNtp1RVr0="
     }
 }

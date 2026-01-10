@@ -19,4 +19,6 @@ cc_library(
     ],
     include_prefix = "imgui",
     visibility = ["//visibility:public"],
+    # imgui_widgets.cpp:5063:58: error: variable 'empty_string' is uninitialized when passed as a const pointer argument here [-Werror,-Wuninitialized-const-pointer]
+    cxxopts = ["-Wno-uninitialized-const-pointer"],
 )

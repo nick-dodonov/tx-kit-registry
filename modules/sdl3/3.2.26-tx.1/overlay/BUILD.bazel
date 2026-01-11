@@ -101,3 +101,10 @@ cc_library(
     }),
     visibility = ["//visibility:public"],
 )
+
+# prepare a convenience library that depends on different static versions
+cc_library(
+    name = "sdl3",
+    deps = [":sdl3_static"],
+    visibility = ["//visibility:public"],
+)

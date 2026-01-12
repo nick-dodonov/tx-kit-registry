@@ -3,6 +3,7 @@
     "integrity": "sha256-2tSIR0pRoLAdVHzSg0iT1imTKNLjD0eaNWQIi1R2uuI=",
     "strip_prefix": "SDL3-3.2.26",
     "overlay": {
-        "BUILD.bazel": "sha256-FowjvlRZKAJ86iQB3cGIV0PL4XDt4S8RaRjxGfFunPQ="
-    }
+        "BUILD.bazel": "sha256-KSVyYFcACvrT1za+YHaCM1Ct5KaYwKHUHI+OsVTSWyE="
+    },
+    "patches": {}
 }

@@ -11,7 +11,7 @@ cc_library(
     includes = ["."],
     deps = [
         "//:imgui",
-        "@sdl3//:sdl3_static",
+        "@sdl3//:sdl3",
     ],
 )
 
@@ -23,7 +23,7 @@ cc_library(
     includes = ["."],
     deps = [
         "//:imgui",
-        "@sdl3//:sdl3_static",
+        "@sdl3//:sdl3",
     ],
 )
 ####

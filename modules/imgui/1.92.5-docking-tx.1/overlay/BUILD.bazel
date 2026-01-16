@@ -1,0 +1,24 @@
+load("@rules_cc//cc:defs.bzl", "cc_library")
+
+cc_library(
+    name = "imgui",
+    srcs = [
+        "imgui.cpp",
+        "imgui_demo.cpp",
+        "imgui_draw.cpp",
+        "imgui_tables.cpp",
+        "imgui_widgets.cpp",
+    ],
+    hdrs = [
+        "imconfig.h",
+        "imgui.h",
+        "imgui_internal.h",
+        "imstb_rectpack.h",
+        "imstb_textedit.h",
+        "imstb_truetype.h",
+    ],
+    include_prefix = "imgui",
+    visibility = ["//visibility:public"],
+    # imgui_widgets.cpp:5063:58: error: variable 'empty_string' is uninitialized when passed as a const pointer argument here [-Werror,-Wuninitialized-const-pointer]
+    # cxxopts = ["-Wno-uninitialized-const-pointer"],
+)

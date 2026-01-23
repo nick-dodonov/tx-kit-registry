@@ -3,7 +3,7 @@
     "integrity": "sha256-CCy/X0KeDYCCD2jcK1B6lNTMG05wgXsRm7uOxqaVhLg=",
     "strip_prefix": "SDL3-3.4.0",
     "overlay": {
-        "BUILD.bazel": "sha256-XJNmJyq6/ApXAhxPY4WhJA+Cf8X4rYdBbekCG0zd3cs="
+        "BUILD.bazel": "sha256-2BDp/tCB3WFRBJFUshgNUu4TGrm1cu5r0DwrBD7pAgw="
     },
     "patches": {}
 }

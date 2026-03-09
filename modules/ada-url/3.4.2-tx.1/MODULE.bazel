@@ -1,0 +1,8 @@
+module(
+    name = "ada-url",
+    version = "3.4.2-tx.1",
+    compatibility_level = 1,
+    bazel_compatibility = [">=7.2.1"],
+)
+
+bazel_dep(name = "platforms", version = "1.0.0")

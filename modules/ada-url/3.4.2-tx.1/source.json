@@ -1,0 +1,8 @@
+{
+    "integrity": "sha256-SuiHvqI2sBtiJaOIt2jRdvp4UlN3zY9HGCuqltJ3X68=",
+    "url": "https://github.com/ada-url/ada/releases/download/v3.4.2/singleheader.zip",
+    "overlay": {
+        "BUILD.bazel": "sha256-vuDKRG6c85ZCgzrfSVsZ7oMHnzbgNjnyQDJugIG6mc0="
+    },
+    "patches": {}
+}

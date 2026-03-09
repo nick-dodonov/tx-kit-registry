@@ -1,0 +1,11 @@
+--- a/emscripten_toolchain/toolchain.bzl
++++ b/emscripten_toolchain/toolchain.bzl
+@@ -548,7 +548,7 @@ def _impl(ctx):
+         # Language Features
+         flag_set(
+             actions = all_cpp_compile_actions,
+-            flags = ["-std=gnu++17", "-nostdinc", "-nostdinc++"],
++            flags = ["-std=c++23", "-nostdinc", "-nostdinc++"],
+         ),
+ 
+         # Emscripten-specific settings:

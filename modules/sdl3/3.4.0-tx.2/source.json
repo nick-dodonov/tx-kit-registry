@@ -3,7 +3,8 @@
     "integrity": "sha256-CCy/X0KeDYCCD2jcK1B6lNTMG05wgXsRm7uOxqaVhLg=",
     "strip_prefix": "SDL3-3.4.0",
     "overlay": {
-        "BUILD.bazel": "sha256-woMvHwEbI6q+yuBZJFrLvDpbMXP81iA3biZ5d/tgjq4="
+        "BUILD.bazel": "sha256-WUsDZwfbnYd0gcmCNoN/d96ommyXAFZ3Q/jn4ozHhs0=",
+        "cmake/PreseedEmscriptenCache.cmake": "sha256-YvAHsxL36Op5DEKTB1pruUy7PM9wFGgftHhVZnFLfuw="
     },
     "patches": {}
 }

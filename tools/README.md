@@ -1,94 +1,94 @@
 # Private Registry Update Integrity Tool
 
-Инструмент для обновления SHA хешей в `source.json` файлах приватного Bazel-реестра.
+Tool for updating SHA hashes in `source.json` files of a private Bazel registry.
 
-## Описание
+## Description
 
-Этот инструмент похож на `update_integrity` из Bazel Central Registry (BCR), но предназначен для работы с приватными реестрами. Он:
+This tool is similar to `update_integrity` from the Bazel Central Registry (BCR), but is designed for working with private registries. It:
 
-1. Скачивает исходный архив по URL из `source.json`
-2. Вычисляет новый SHA хеш архива 
-3. Обновляет хеши всех файлов в `overlay/` директории
-4. Обновляет хеши всех файлов в `patches/` директории (если есть)
-5. Сохраняет обновленный `source.json`
+1. Downloads the source archive from the URL in `source.json`
+2. Calculates the new SHA hash of the archive
+3. Updates the hashes of all files in the `overlay/` directory
+4. Updates the hashes of all files in the `patches/` directory (if present)
+5. Saves the updated `source.json`
 
-## Использование
+## Usage
 
-### Python скрипт (напрямую)
+### Python script (direct)
 
 ```bash
 cd /path/to/your/registry
 python3 tools/update_integrity.py <module_name> [--version <version>]
 
-# Примеры:
+# Examples:
 python3 tools/update_integrity.py lwlog
 python3 tools/update_integrity.py lwlog --version 1.4.0
 ```
 
-### Shell wrapper (рекомендуется)
+### Shell wrapper (recommended)
 
 ```bash
 cd /path/to/your/registry
 ./tools/update_integrity.sh <module_name> [version]
 
-# Примеры:
+# Examples:
 ./tools/update_integrity.sh lwlog
 ./tools/update_integrity.sh lwlog 1.4.0
 ```
 
-## Опции
+## Options
 
-- `module` - имя модуля для обновления (обязательно)
-- `--version` / второй аргумент - версия модуля (опционально, по умолчанию последняя)
-- `--registry` - путь к корню реестра (по умолчанию текущая директория)
+- `module` - module name to update (required)
+- `--version` / second argument - module version (optional, latest by default)
+- `--registry` - path to registry root (current directory by default)
 
-## Когда использовать
+## When to Use
 
-Запускайте этот инструмент когда:
+Run this tool when:
 
-1. **Перед коммитом изменений** в overlay файлы (BUILD.bazel, MODULE.bazel и т.д.)
-2. **После добавления новых patch файлов**
-3. **При изменении URL источника** в source.json
-4. **Для проверки консистентности** после изменений в реестре
+1. **Before committing changes** to overlay files (BUILD.bazel, MODULE.bazel, etc.)
+2. **After adding new patch files**
+3. **When changing the source URL** in source.json
+4. **To verify consistency** after changes in the registry
 
-## Пример рабочего процесса
+## Example Workflow
 
 ```bash
-# 1. Внесите изменения в overlay файлы
+# 1. Make changes to overlay files
 echo 'cc_library(name = "test")' >> modules/lwlog/1.4.0/overlay/BUILD.bazel
 
-# 2. Обновите integrity хеши
+# 2. Update integrity hashes
 ./tools/update_integrity.sh lwlog 1.4.0
 
-# 3. Закоммитьте изменения
+# 3. Commit changes
 git add .
 git commit -m "Update lwlog overlay"
 git push
 ```
 
-## Структура реестра
+## Registry Structure
 
-Инструмент работает с реестрами следующей структуры:
+The tool works with registries of the following structure:
 
 ```
 registry_root/
-├── bazel_registry.json          # Конфигурация реестра
-├── modules/                     # Директория модулей (задается в bazel_registry.json)
-│   └── lwlog/                   # Имя модуля
-│       └── 1.4.0/              # Версия модуля
-│           ├── source.json      # Метаданные источника (обновляется инструментом)
-│           ├── MODULE.bazel     # Bazel модуль
-│           ├── overlay/         # Overlay файлы (BUILD.bazel, MODULE.bazel и т.д.)
+├── bazel_registry.json          # Registry configuration
+├── modules/                     # Modules directory (specified in bazel_registry.json)
+│   └── lwlog/                   # Module name
+│       └── 1.4.0/              # Module version
+│           ├── source.json      # Source metadata (updated by tool)
+│           ├── MODULE.bazel     # Bazel module
+│           ├── overlay/         # Overlay files (BUILD.bazel, MODULE.bazel, etc.)
 │           │   ├── BUILD.bazel
 │           │   └── MODULE.bazel
-│           └── patches/         # Patch файлы (опционально)
+│           └── patches/         # Patch files (optional)
 │               └── fix.patch
-└── tools/                       # Инструменты реестра
-    ├── update_integrity.py      # Python скрипт
+└── tools/                       # Registry tools
+    ├── update_integrity.py      # Python script
     └── update_integrity.sh      # Shell wrapper
 ```
 
-## Формат source.json
+## source.json Format
 
 ```json
 {
@@ -105,34 +105,34 @@ registry_root/
 }
 ```
 
-## Зависимости
+## Dependencies
 
 - Python 3.6+
-- Стандартная библиотека Python (json, hashlib, urllib, pathlib)
-- Доступ к интернету для скачивания архивов
+- Python standard library (json, hashlib, urllib, pathlib)
+- Internet access for downloading archives
 
-## Сравнение с BCR
+## Comparison with BCR
 
-| Особенность | BCR update_integrity | Этот инструмент |
-|-------------|---------------------|-----------------|
-| Цель | Bazel Central Registry | Приватные реестры |
-| Зависимости | click, специальная структура BCR | Только стандартная библиотека Python |
-| Конфигурация | Жестко закодированная для BCR | Читает bazel_registry.json |
-| Модули | Все модули BCR | Модули вашего реестра |
+| Feature | BCR update_integrity | This tool |
+|---------|---------------------|-----------|
+| Target | Bazel Central Registry | Private registries |
+| Dependencies | click, special BCR structure | Python standard library only |
+| Configuration | Hardcoded for BCR | Reads bazel_registry.json |
+| Modules | All BCR modules | Your registry modules |
 
-## Устранение неполадок
+## Troubleshooting
 
-### Ошибка "Registry root does not exist"
-Убедитесь, что запускаете инструмент из корня реестра или используете правильный путь в `--registry`.
+### Error "Registry root does not exist"
+Make sure you run the tool from the registry root or use the correct path in `--registry`.
 
-### Ошибка "Module not found"
-Проверьте имя модуля:
+### Error "Module not found"
+Check the module name:
 ```bash
-ls modules/  # Посмотрите доступные модули
+ls modules/  # View available modules
 ```
 
-### Ошибка "Failed to download"
-Проверьте URL в source.json и доступность интернета.
+### Error "Failed to download"
+Check the URL in source.json and internet connectivity.
 
-### Ошибка "source.json not found"
-Убедитесь, что файл `source.json` существует для указанной версии модуля.
+### Error "source.json not found"
+Make sure the `source.json` file exists for the specified module version.
